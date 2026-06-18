@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BigQuery Release Notes Dashboard</title>
+    <!-- Google Fonts: Inter and Outfit -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap">
+    <!-- Lucide Icons for modern icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="glass-bg"></div>
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i data-lucide="database" class="icon-primary"></i>
+                </div>
+                <div>
+                    <h1>BigQuery Release Notes</h1>
+                    <p class="subtitle">Stay updated with Google Cloud BigQuery changes</p>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <button id="btn-refresh" class="btn btn-primary" title="Refresh Release Notes">
+                    <i data-lucide="refresh-cw" id="spinner-icon"></i>
+                    <span>Refresh</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Search & Filter Bar -->
+        <div class="search-filter-section glass-card">
+            <div class="search-box">
+                <i data-lucide="search" class="search-icon"></i>
+                <input type="text" id="search-input" placeholder="Search release notes by keywords...">
+            </div>
+            <div class="filter-pills" id="filter-pills">
+                <button class="pill active" data-type="all">All Updates</button>
+                <button class="pill" data-type="feature"><span class="dot dot-feature"></span>Features</button>
+                <button class="pill" data-type="changed"><span class="dot dot-changed"></span>Changes</button>
+                <button class="pill" data-type="deprecation"><span class="dot dot-deprecation"></span>Deprecations</button>
+                <button class="pill" data-type="other">Others</button>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <main class="main-grid">
+            <!-- Left: Release Notes List -->
+            <section class="notes-section">
+                <div class="section-header">
+                    <h2>Release Logs</h2>
+                    <span class="count-badge" id="visible-count">0 items</span>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="loading-state" class="state-container">
+                    <div class="loading-spinner"></div>
+                    <p>Fetching BigQuery release notes...</p>
+                </div>
+
+                <!-- Error State -->
+                <div id="error-state" class="state-container hidden">
+                    <i data-lucide="alert-triangle" class="error-icon"></i>
+                    <h3>Failed to load release notes</h3>
+                    <p id="error-message">Check your connection and try again.</p>
+                    <button id="btn-retry" class="btn btn-secondary">Retry</button>
+                </div>
+
+                <!-- Empty State -->
+                <div id="empty-state" class="state-container hidden">
+                    <i data-lucide="inbox" class="empty-icon"></i>
+                    <h3>No updates found</h3>
+                    <p>Try resetting filters or searching with different terms.</p>
+                </div>
+
+                <!-- Release Notes Container -->
+                <div id="release-notes-container" class="notes-timeline"></div>
+            </section>
+
+            <!-- Right: Twitter Share Drawer / Card -->
+            <section class="composer-section">
+                <div class="sticky-container">
+                    <div class="glass-card composer-card">
+                        <div class="composer-header">
+                            <div class="title-with-icon">
+                                <i data-lucide="twitter" class="twitter-blue-icon"></i>
+                                <h3>Tweet Composer</h3>
+                            </div>
+                            <span class="status-badge inactive" id="composer-status">No selection</span>
+                        </div>
+                        
+                        <div class="composer-body">
+                            <!-- No Selection Hint -->
+                            <div id="composer-hint" class="composer-hint">
+                                <i data-lucide="mouse-pointer-click" class="hint-icon"></i>
+                                <p>Select any specific update on the left to compose a tweet automatically.</p>
+                            </div>
+
+                            <!-- Composer Form (hidden until selected) -->
+                            <div id="composer-form" class="composer-form hidden">
+                                <div class="selected-details">
+                                    <div class="detail-row">
+                                        <span class="detail-label">Source Update Date:</span>
+                                        <span class="detail-value" id="selected-date">-</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Type:</span>
+                                        <span class="detail-value" id="selected-type">-</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="tweet-textarea">Customize Tweet Content:</label>
+                                    <textarea id="tweet-textarea" rows="6" placeholder="What's happening?"></textarea>
+                                </div>
+
+                                <div class="composer-footer">
+                                    <div class="char-counter" id="char-counter">
+                                        <span id="char-count">0</span>/280
+                                    </div>
+                                    <button id="btn-tweet" class="btn btn-tweet-action">
+                                        <i data-lucide="send"></i>
+                                        <span>Tweet on X</span>
+                                    </button>
+                                </div>
+
+                                <div id="char-warning" class="char-warning hidden">
+                                    <i data-lucide="alert-circle"></i>
+                                    <span>Warning: Tweet exceeds X's 280-character limit! It will be truncated.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        lucide.createIcons();
+    </script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
