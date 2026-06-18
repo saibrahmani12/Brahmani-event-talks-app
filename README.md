@@ -2,7 +2,7 @@
 
 A premium, responsive dark-mode Flask web application that parses and aggregates Google Cloud's BigQuery Release Notes feed. It includes an interactive X (Twitter) composer that lets you select any specific release update, auto-fits the summary to meet X's 280-character limit, and provides real-time validation before posting.
 
-## 🚀 Key Features
+##  Key Features
 
 * **Live RSS/Atom Parsing**: Fetches the official Google Cloud BigQuery release notes XML feed in real-time.
 * **Granular Extraction**: Parses and separates daily updates into individual, selectable cards classified by type (`Feature`, `Changed`, `Deprecation`, etc.).
@@ -24,7 +24,7 @@ A premium, responsive dark-mode Flask web application that parses and aggregates
 
 ---
 
-## 📦 Directory Structure
+##  Directory Structure
 
 ```text
 ├── app.py                  # Flask application server (XML parsing & JSON API)
@@ -72,7 +72,7 @@ Open **[http://127.0.0.1:5000](http://127.0.0.1:5000)** in your web browser.
 
 ---
 
-## 📝 Usage Guide
+##  Usage Guide
 
 1. **Browse & Refresh**: The dashboard loads the feed automatically. Click **Refresh** to sync the latest updates.
 2. **Search & Filter**: Type keywords into the search bar or use the pill selectors to find a particular update.
