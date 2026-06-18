@@ -4,9 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedUpdateId = null;
     let currentFilterType = 'all';
     let searchQuery = '';
+    let currentlyVisibleUpdates = [];
 
     // DOM Elements
     const btnRefresh = document.getElementById('btn-refresh');
+    const btnExport = document.getElementById('btn-export');
     const spinnerIcon = document.getElementById('spinner-icon');
     const searchInput = document.getElementById('search-input');
     const filterPillsContainer = document.getElementById('filter-pills');
@@ -96,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Render Release Notes with Filtering and Searching
     function renderReleaseNotes() {
         releaseNotesContainer.innerHTML = '';
+        currentlyVisibleUpdates = [];
         let matchedCount = 0;
         let totalCount = 0;
 
@@ -129,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     
                     matchedCount++;
+                    currentlyVisibleUpdates.push(update);
                     
                     const noteCard = document.createElement('div');
                     noteCard.className = `note-item glass-card ${selectedUpdateId === update.id ? 'selected' : ''}`;
@@ -136,10 +140,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     noteCard.innerHTML = `
                         <div class="note-item-header">
                             <span class="badge ${classified.class}">${classified.display}</span>
-                            <span class="note-meta">
-                                <i data-lucide="calendar" style="width:13px;height:13px;"></i>
-                                ${day.date}
-                            </span>
+                            <div class="note-header-actions">
+                                <span class="note-meta">
+                                    <i data-lucide="calendar" style="width:13px;height:13px;"></i>
+                                    ${day.date}
+                                </span>
+                                <button class="btn-copy-card" title="Copy to Clipboard">
+                                    <i data-lucide="copy" style="width:14px;height:14px;"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="note-body">
                             ${update.content_html}
@@ -148,6 +157,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // Click handler to select update
                     noteCard.addEventListener('click', () => selectUpdate(update));
+                    
+                    // Copy to clipboard handler
+                    const btnCopy = noteCard.querySelector('.btn-copy-card');
+                    btnCopy.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Stop click from bubbling and selecting card
+                        copyToClipboard(update.plain_text, btnCopy);
+                    });
                     
                     dayContainer.appendChild(noteCard);
                 }
@@ -268,10 +284,73 @@ document.addEventListener('DOMContentLoaded', () => {
     // Textarea input handler
     tweetTextarea.addEventListener('input', updateCharCounter);
 
+    // Utility: Copy to clipboard with success state
+    function copyToClipboard(text, buttonElement) {
+        navigator.clipboard.writeText(text).then(() => {
+            const icon = buttonElement.querySelector('i');
+            buttonElement.classList.add('copied');
+            icon.setAttribute('data-lucide', 'check');
+            lucide.createIcons();
+
+            setTimeout(() => {
+                buttonElement.classList.remove('copied');
+                icon.setAttribute('data-lucide', 'copy');
+                lucide.createIcons();
+            }, 1500);
+        }).catch(err => {
+            console.error('Failed to copy to clipboard:', err);
+        });
+    }
+
+    // Export filtered release notes list to CSV
+    function exportToCSV() {
+        if (currentlyVisibleUpdates.length === 0) {
+            alert('No release notes to export.');
+            return;
+        }
+
+        const headers = ['Date', 'Type', 'Description', 'Link'];
+        const csvRows = [];
+        
+        // Add header row
+        csvRows.push(headers.join(','));
+
+        currentlyVisibleUpdates.forEach(update => {
+            const row = [
+                update.date,
+                update.type,
+                update.plain_text,
+                update.link
+            ];
+            
+            // Format and escape cell values for CSV standard
+            const formattedRow = row.map(val => {
+                const escaped = String(val).replace(/"/g, '""');
+                return `"${escaped}"`;
+            });
+            
+            csvRows.push(formattedRow.join(','));
+        });
+
+        // Add UTF-8 BOM representation for Excel compatibility
+        const csvContent = "\uFEFF" + csvRows.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `bigquery_release_notes_${new Date().toISOString().slice(0,10)}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
     // Button Actions
     btnRefresh.addEventListener('click', fetchReleaseNotes);
     btnRetry.addEventListener('click', fetchReleaseNotes);
     btnTweet.addEventListener('click', openTweetComposer);
+    btnExport.addEventListener('click', exportToCSV);
 
     // Initial load
     fetchReleaseNotes();
