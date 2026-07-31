@@ -72,9 +72,3 @@ Open **[http://127.0.0.1:5000](http://127.0.0.1:5000)** in your web browser.
 
 ---
 
-##  Usage Guide
-
-1. **Browse & Refresh**: The dashboard loads the feed automatically. Click **Refresh** to sync the latest updates.
-2. **Search & Filter**: Type keywords into the search bar or use the pill selectors to find a particular update.
-3. **Select an Update**: Click on any update card on the left pane. This highlights the card and loads it into the **Tweet Composer** on the right.
-4. **Draft and Post**: Modify the tweet text in the editor if desired. The character counter updates dynamically. Click **Tweet on X** to preview and publish the tweet on your X account.
